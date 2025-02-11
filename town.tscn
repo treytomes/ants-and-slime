@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://difgd3c2mu8e2"]
+
+[ext_resource type="Script" path="res://town.gd" id="1_t6scc"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_008v7"]
+
+[node name="Area2D" type="Area2D" groups=["town"]]
+script = ExtResource("1_t6scc")
+radius = 10.0
+filled = true
+antialiased = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_008v7")

@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=3 uid="uid://qwvqkv7nkher"]
+
+[ext_resource type="Script" path="res://travelling_salesman.gd" id="1_gg4bd"]
+[ext_resource type="PackedScene" uid="uid://difgd3c2mu8e2" path="res://town.tscn" id="2_c5qwb"]
+
+[node name="TravellingSalesman" type="Node2D"]
+script = ExtResource("1_gg4bd")
+town_scene = ExtResource("2_c5qwb")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SolvingLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Solving {} point problem."
+
+[node name="SearchedLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Searched: 0 / 0"
+
+[node name="ProgressLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Progress: 0%"
+
+[node name="DurationLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Duration: 0.00s"
+
+[node name="DistanceLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Best dst: N/A"
+
+[node name="SolveButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Solve"
+
+[node name="StopButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Stop"
+
+[node name="ClearButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Clear"
+
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/SolveButton" to="." method="_on_solve_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/StopButton" to="." method="_on_stop_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/ClearButton" to="." method="_on_clear_button_pressed"]
