@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://qwvqkv7nkher"]
+[gd_scene load_steps=5 format=3 uid="uid://qwvqkv7nkher"]
 
 [ext_resource type="Script" path="res://travelling_salesman.gd" id="1_gg4bd"]
 [ext_resource type="PackedScene" uid="uid://difgd3c2mu8e2" path="res://town.tscn" id="2_c5qwb"]
+[ext_resource type="PackedScene" uid="uid://7c0jgoeei1g6" path="res://components/toast/toast_container.tscn" id="3_83xod"]
+[ext_resource type="PackedScene" uid="uid://ch7nrdnr6t88s" path="res://components/player_camera/player_camera.tscn" id="3_653so"]
 
 [node name="TravellingSalesman" type="Node2D"]
 script = ExtResource("1_gg4bd")
@@ -12,6 +14,7 @@ town_scene = ExtResource("2_c5qwb")
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
 
 [node name="SolvingLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
@@ -44,6 +47,16 @@ text = "Stop"
 [node name="ClearButton" type="Button" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
 text = "Clear"
+
+[node name="ToastContainer" parent="CanvasLayer" instance=ExtResource("3_83xod")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+size_flags_vertical = 10
+metadata/_edit_use_anchors_ = true
+
+[node name="Player Camera" parent="." instance=ExtResource("3_653so")]
 
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/SolveButton" to="." method="_on_solve_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/StopButton" to="." method="_on_stop_button_pressed"]

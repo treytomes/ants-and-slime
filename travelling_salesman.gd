@@ -1,11 +1,16 @@
 extends Node2D
 
 
-const WAIT_TIME: float = 0.000001
+signal permutation_generated(path: Array[Vector2])
+
+
+#const WAIT_TIME: float = 1E-10
 
 var is_solving: bool = false
 var solve_time: float = 0
 var path: Array[Vector2] = []
+var best_distance: float = INF
+var counter: int = 0
 
 @export var town_scene: PackedScene
 @export var path_color: Color = Color.BLACK
@@ -15,40 +20,39 @@ var path: Array[Vector2] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	self.clear()
+	self.connect("permutation_generated", _on_permutation_generated)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if is_solving:
-		solve_time += delta
-		$CanvasLayer/VBoxContainer/DurationLabel.text = "Duration: {solve_time}s".format({
-			"solve_time": "%4.2f" % solve_time
-		})
+	if self.is_solving:
+		self.solve_time += delta
+		self.update_ui()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if self.is_solving:
-		print("Waiting for solution...")
+		return
 	
 	if event is InputEventMouseButton:
 		var e = event as InputEventMouseButton
 		if e.pressed:
 			if e.button_index == MOUSE_BUTTON_LEFT:
+				# Convert the event's screen position into world coordinates.
+				var pos = get_viewport().get_camera_2d().screen_to_local(event.position)
+				
 				var town = town_scene.instantiate()
-				town.position = e.position
+				town.position = pos
 				add_child(town)
-				$CanvasLayer/VBoxContainer/SolvingLabel.text = "Solving {points} point problem.".format({
-					"points": self.get_num_towns()
-				})
+				self.update_ui()
+				#$CanvasLayer/ToastContainer.add_toast("Click!")
 			elif e.button_index == MOUSE_BUTTON_RIGHT:
 				for child in self.get_towns():
-					var distance = (e.position - child.position).length()
+					var pos = self.get_viewport().get_camera_2d().screen_to_local(e.position)
+					var distance = (pos - child.position).length()
 					if distance < child.radius:
 						child.queue_free()
-				$CanvasLayer/VBoxContainer/SolvingLabel.text = "Solving {points} point problem.".format({
-					"points": self.get_num_towns()
-				})
 
 
 func _draw() -> void:
@@ -76,6 +80,34 @@ func _on_clear_button_pressed() -> void:
 	self.clear()
 
 
+# Update UI elements to match the data.
+func update_ui() -> void:
+	var num_permutations = self.get_num_permutations()
+	
+	$CanvasLayer/VBoxContainer/SolvingLabel.text = "Solving {points} point problem.".format({
+		"points": self.get_num_towns()
+	})
+	$CanvasLayer/VBoxContainer/DurationLabel.text = "Duration: {solve_time}s".format({
+		"solve_time": "%4.2f" % self.solve_time
+	})
+	$CanvasLayer/VBoxContainer/DistanceLabel.text = "Best dst: {best_distance}".format({
+		"best_distance": "%2.3f" % self.best_distance
+	})
+	$CanvasLayer/VBoxContainer/SearchedLabel.text = "Searched: {current} / {total}".format({
+		"current": self.counter,
+		"total": num_permutations,
+	})
+	$CanvasLayer/VBoxContainer/ProgressLabel.text = "Progress: {percent}%".format({
+		"percent": "%3.2f" % (self.counter / float(num_permutations) * 100),
+	})
+
+
+func reset() -> void:
+	self.counter = 0
+	self.solve_time = 0
+	self.best_distance = INF
+
+
 func clear() -> void:
 	for child in self.get_children():
 		if not child.is_in_group("town"):
@@ -83,21 +115,18 @@ func clear() -> void:
 		child.queue_free()
 	self.path = []
 	self.is_solving = false
+	self.reset()
 	self.queue_redraw()
+	self.update_ui()
 
 
 func solve():
+	self.reset()
 	self.is_solving = true
-	self.solve_time = 0
 	
 	var positions = self.get_town_positions()
-	print("Positions: " + str(positions))
-	var best_path = await self.shortest_path(positions)
-	print("Shortest path:", best_path)
-	self.path = best_path.duplicate()
-	self.queue_redraw()
 	
-	self.is_solving = false
+	await self.heap_permute(positions)
 
 
 func get_towns() -> Array[Area2D]:
@@ -121,73 +150,64 @@ func get_town_positions() -> Array[Vector2]:
 	return positions
 
 
-# Evaluate the paths to find the shortest.
-func shortest_path(positions: Array[Vector2]) -> Array[Vector2]:
-	var best_path: Array[Vector2] = []
-	var best_distance = INF
-	var permutations: Array = []
-	
-	print("Loading permutations...")
-	await heap_permute(positions.size(), positions.duplicate(), permutations)
-	print("Done.")
-	
-	var n: int = 0
-	for path in permutations:
-		if not self.is_solving:
-			break
-		var distance = path_distance(path)
-		if distance < best_distance:
-			best_distance = distance
-			best_path = path
-			self.path = best_path
-			$CanvasLayer/VBoxContainer/DistanceLabel.text = "Best dst: {best_distance}".format({
-				"best_distance": "%2.3f" % best_distance
-			})
-			self.queue_redraw()
-		n += 1
-		$CanvasLayer/VBoxContainer/SearchedLabel.text = "Searched: {current} / {total}".format({
-			"current": n,
-			"total": permutations.size(),
-		})
-		$CanvasLayer/VBoxContainer/ProgressLabel.text = "Progress: {percent}%".format({
-			"percent": "%3.2f" % (n / float(permutations.size()) * 100),
-		})
-		await get_tree().create_timer(0.001).timeout
-	print("Best path found.")
-	
-	return best_path
+func factorial(n: int):
+	var p = 1
+	for n0 in range(2, n + 1):
+		p *= n0
+	return p
+
+
+func get_num_permutations() -> int:
+	return self.factorial(self.get_num_towns())
+
+
+func _on_permutation_generated(path: Array[Vector2]):
+	var distance = self.path_distance(path)
+	if distance < self.best_distance:
+		self.best_distance = distance
+		self.path = path
+		self.queue_redraw()
+
+	self.counter += 1
+	self.update_ui()
+
 
 # Heap's algorithm for generating all permutations.
-func heap_permute(n: int, arr: Array, result: Array):
-	var indices = []
-	for i in range(n):
-		indices.append(0)  # Initialize index array with 0
+func heap_permute(arr: Array):
+	var n = arr.size()
+	var indices = PackedInt32Array()
+	indices.resize(n)
 	
-	result.append(arr.duplicate())  # Store the first permutation
+	# Emit the first permutation
+	await get_tree().process_frame  # Allow for async behavior
+	#await get_tree().create_timer(WAIT_TIME).timeout
+	emit_signal("permutation_generated", arr.duplicate())
 	
 	var i = 0
 	while i < n:
+		if not self.is_solving:
+			break
+		
 		if indices[i] < i:
-			# Swap depends on parity of i
-			if i % 2 == 0:
-				var copy = arr[0]
-				arr[0] = arr[i]
-				arr[i] = copy
-			else:
-				var copy = arr[indices[i]]
-				arr[indices[i]] = arr[i]
-				arr[i] = copy
+			var swap_idx = 0 if i % 2 == 0 else indices[i]
 			
-			result.append(arr.duplicate())  # Store new permutation
+			# Swap elements
+			var temp = arr[swap_idx]
+			arr[swap_idx] = arr[i]
+			arr[i] = temp
+			
+			# Emit the next permutation
+			await get_tree().process_frame  # Yield to the engine
+			#await get_tree().create_timer(WAIT_TIME).timeout
+			emit_signal("permutation_generated", arr.duplicate())
+			
 			indices[i] += 1
-			i = 0  # Reset i for the next permutation
+			i = 0  # Reset i for next permutation
 		else:
-			indices[i] = 0  # Reset index
-			i += 1  # Move to next position
-			if i % 4 == 0:
-				if not self.is_solving:
-					break
-				await get_tree().create_timer(WAIT_TIME).timeout
+			indices[i] = 0
+			i += 1  # Move to the next index
+	
+	self.is_solving = false
 
 
 func path_distance(path: Array[Vector2]) -> float:
