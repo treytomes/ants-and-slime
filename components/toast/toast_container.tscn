@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://7c0jgoeei1g6"]
+
+[ext_resource type="Script" path="res://components/toast/toast_container.gd" id="1_h2wt4"]
+[ext_resource type="PackedScene" uid="uid://csy2yc8wmno6p" path="res://components/toast/toast.tscn" id="1_osfmu"]
+
+[node name="ToastContainer" type="Panel"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_h2wt4")
+toast_scene = ExtResource("1_osfmu")
+
+[node name="Toaster" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -25.0
+offset_right = 219.0
+grow_vertical = 0
