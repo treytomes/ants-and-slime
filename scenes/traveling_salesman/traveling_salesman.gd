@@ -159,6 +159,7 @@ func factorial(n: int):
 
 func get_num_permutations() -> int:
 	return self.factorial(self.get_num_towns())
+	#return self.factorial(self.get_num_towns() - 1) / 2
 
 
 func _on_permutation_generated(path: Array[Vector2]):
