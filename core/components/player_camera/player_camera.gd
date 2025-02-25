@@ -30,6 +30,15 @@ func screen_to_local(pos: Vector2) -> Vector2:
 	return (pos - viewport_size / 2) / zoom + camera_pos
 
 
+func local_to_screen(pos: Vector2) -> Vector2:
+	var viewport_rect = get_viewport_rect()
+	var viewport_size = viewport_rect.size
+	var camera = get_viewport().get_camera_2d()
+	var zoom = camera.zoom
+	var camera_pos = camera.global_position
+	return (pos - camera_pos) * zoom + viewport_size / 2
+
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		on_mouse_button_event(event as InputEventMouseButton)

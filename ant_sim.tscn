@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://bhdveg46rays3"]
 
-[ext_resource type="PackedScene" uid="uid://7c0jgoeei1g6" path="res://components/toast/toast_container.tscn" id="1_1jw61"]
-[ext_resource type="PackedScene" uid="uid://ch7nrdnr6t88s" path="res://components/player_camera/player_camera.tscn" id="2_qfp68"]
-[ext_resource type="PackedScene" uid="uid://cv4uxcqp1r4a1" path="res://ant.tscn" id="3_60oyd"]
+[ext_resource type="PackedScene" uid="uid://7c0jgoeei1g6" path="res://core/components/toast/toast_container.tscn" id="1_1jw61"]
+[ext_resource type="PackedScene" uid="uid://ch7nrdnr6t88s" path="res://core/components/player_camera/player_camera.tscn" id="2_qfp68"]
+[ext_resource type="PackedScene" uid="uid://cv4uxcqp1r4a1" path="res://components/ant/ant.tscn" id="3_60oyd"]
 
 [node name="AntSim" type="Node2D"]
 
