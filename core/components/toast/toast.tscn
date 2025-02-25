@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://csy2yc8wmno6p"]
 
-[ext_resource type="Script" path="res://components/toast/toast.gd" id="1_gcllw"]
+[ext_resource type="Script" path="res://core/components/toast/toast.gd" id="1_gcllw"]
 
 [node name="Toast" type="MarginContainer"]
 offset_right = 217.0
