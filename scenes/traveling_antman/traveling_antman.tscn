@@ -1,0 +1,69 @@
+[gd_scene load_steps=6 format=3 uid="uid://ceyw2n6g3m4d"]
+
+[ext_resource type="Script" path="res://scenes/traveling_antman/traveling_antman.gd" id="1_y8vys"]
+[ext_resource type="PackedScene" uid="uid://difgd3c2mu8e2" path="res://components/town/town.tscn" id="2_5ipau"]
+[ext_resource type="PackedScene" uid="uid://7c0jgoeei1g6" path="res://core/components/toast/toast_container.tscn" id="3_0eai7"]
+[ext_resource type="PackedScene" uid="uid://di7ymvuiavfr1" path="res://components/traveling_ant/traveling_ant.tscn" id="3_5fp8q"]
+[ext_resource type="PackedScene" uid="uid://ch7nrdnr6t88s" path="res://core/components/player_camera/player_camera.tscn" id="4_kmn3d"]
+
+[node name="TravelingAntman" type="Node2D"]
+script = ExtResource("1_y8vys")
+town_scene = ExtResource("2_5ipau")
+ant_scene = ExtResource("3_5fp8q")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
+
+[node name="SolvingLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Solving {} point problem."
+
+[node name="DurationLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Duration: 0.00s"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Distance power:"
+
+[node name="DistancePowerLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="DistancePowerSlider" type="HSlider" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+step = 0.1
+
+[node name="SolveButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Solve"
+
+[node name="StopButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Stop"
+
+[node name="ClearButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Clear"
+
+[node name="ToastContainer" parent="CanvasLayer" instance=ExtResource("3_0eai7")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+size_flags_vertical = 10
+metadata/_edit_use_anchors_ = true
+
+[node name="Player Camera" parent="." instance=ExtResource("4_kmn3d")]
+
+[connection signal="value_changed" from="CanvasLayer/VBoxContainer/DistancePowerSlider" to="." method="_on_distance_power_slider_value_changed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/SolveButton" to="." method="_on_solve_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/StopButton" to="." method="_on_stop_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/ClearButton" to="." method="_on_clear_button_pressed"]
