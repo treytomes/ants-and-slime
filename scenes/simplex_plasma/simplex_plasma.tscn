@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvonnhn3shih5"]
+
+[ext_resource type="Shader" path="res://scenes/simplex_plasma/simplex_plasma.gdshader" id="1_vp7mh"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v8ky7"]
+shader = ExtResource("1_vp7mh")
+
+[node name="SimplexNoise" type="ColorRect"]
+material = SubResource("ShaderMaterial_v8ky7")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
